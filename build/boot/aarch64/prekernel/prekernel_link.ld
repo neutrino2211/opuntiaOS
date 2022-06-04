@@ -27,6 +27,12 @@ SECTIONS
 		*(.data.*)
 	}
 
+	.got :
+	{
+		*(.got)
+		*(.got.*)
+	}
+
 	.bss :
 	{
 		*(.bss)
