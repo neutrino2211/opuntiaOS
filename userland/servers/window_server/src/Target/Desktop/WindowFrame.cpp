@@ -47,6 +47,19 @@ static const uint32_t s_maximise_button_glyph_data[10] = {
     0b0000011111
 };
 
+static const uint32_t s_revert_maximise_glyph_data[10] = {
+    0b0011000000,
+    0b0111000000,
+    0b1111000000,
+    0b1111000000,
+    0b0000000000,
+    0b0000000000,
+    0b0000001111,
+    0b0000001111,
+    0b0000001110,
+    0b0000001100
+};
+
 static const uint32_t s_minimise_button_glyph_data[10] = {
     0b0000000000,
     0b0000000000,
@@ -60,28 +73,29 @@ static const uint32_t s_minimise_button_glyph_data[10] = {
     0b1111111111
 };
 
+LG::GlyphMetrics icon_glyph_metrics = {
+    .width = 10,
+    .height = 10,
+    .top_bearing = 10,
+    .left_bearing = 0,
+    .baseline = 0,
+    .advance = 10,
+    .font_size = 10
+};
+
 WindowFrame::WindowFrame(Window& window)
     : m_window(window)
     , m_window_control_buttons()
     , m_control_panel_buttons()
 {
     set_style(StatusBarStyle::StandardLight);
-    LG::GlyphMetrics metrics = {
-        .width = 10,
-        .height = 10,
-        .top_bearing = 10,
-        .left_bearing = 0,
-        .baseline = 0,
-        .advance = 10,
-        .font_size = 10
-    };
 
     auto* close = new Button();
-    close->set_icon(LG::Glyph(s_close_button_glyph_data, metrics, LG::Glyph::ConstDataMarker {}));
+    close->set_icon(LG::Glyph(s_close_button_glyph_data, icon_glyph_metrics, LG::Glyph::ConstDataMarker {}));
     auto* maximize = new Button();
-    maximize->set_icon(LG::Glyph(s_maximise_button_glyph_data, metrics, LG::Glyph::ConstDataMarker {}));
+    maximize->set_icon(LG::Glyph(s_maximise_button_glyph_data, icon_glyph_metrics, LG::Glyph::ConstDataMarker {}));
     auto* minimize = new Button();
-    minimize->set_icon(LG::Glyph(s_minimise_button_glyph_data, metrics, LG::Glyph::ConstDataMarker {}));
+    minimize->set_icon(LG::Glyph(s_minimise_button_glyph_data, icon_glyph_metrics, LG::Glyph::ConstDataMarker {}));
 
     close->set_title_color(LG::Color(196, 128, 128));
 
@@ -210,7 +224,13 @@ void WindowFrame::handle_control_panel_tap(int button_id)
         wm.close_window(m_window);
         break;
     case CONTROL_PANEL_MAXIMIZE:
-        wm.maximize_window(m_window);
+        if(m_window.is_maximised()) {
+            wm.unmaximise_window(m_window);
+            m_window_control_buttons[CONTROL_PANEL_MAXIMIZE]->set_icon(LG::Glyph(s_maximise_button_glyph_data, icon_glyph_metrics, LG::Glyph::ConstDataMarker {}));
+        } else {
+            wm.maximize_window(m_window);
+            m_window_control_buttons[CONTROL_PANEL_MAXIMIZE]->set_icon(LG::Glyph(s_revert_maximise_glyph_data, icon_glyph_metrics, LG::Glyph::ConstDataMarker {}));
+        }
         break;
     case CONTROL_PANEL_MINIMIZE:
         wm.minimize_window(m_window);

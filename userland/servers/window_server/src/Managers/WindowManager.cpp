@@ -149,11 +149,30 @@ void WindowManager::maximize_window(Window& window)
     size_t fullscreen_h = m_screen.height();
     fullscreen_h = visible_area().height();
 
+    window.set_is_maximised(true);
+    window.set_previous_bounds(window.bounds());
+
     const size_t vertical_borders = Desktop::WindowFrame::std_top_border_size() + Desktop::WindowFrame::std_bottom_border_size();
     const size_t horizontal_borders = Desktop::WindowFrame::std_left_border_size() + Desktop::WindowFrame::std_right_border_size();
 
     move_window(&window, -window.bounds().min_x(), -(window.bounds().min_y() - menu_bar().height()));
     resize_window(window, { m_screen.width() - horizontal_borders, fullscreen_h - vertical_borders });
+}
+
+void WindowManager::unmaximise_window(Window& window)
+{
+    window.set_is_maximised(false);
+    LG::Rect previous_bounds = window.bounds();
+#if WM_DEBUG
+    Logger::debug << "unmaximise previous bounds " << window.previous_bounds() << std::endl;
+#endif
+    const size_t vertical_borders = Desktop::WindowFrame::std_top_border_size() + Desktop::WindowFrame::std_bottom_border_size();
+    const size_t horizontal_borders = Desktop::WindowFrame::std_left_border_size() + Desktop::WindowFrame::std_right_border_size();
+
+
+    move_window(&window, window.previous_bounds().origin().x(), window.previous_bounds().origin().y() - menu_bar().height());
+    resize_window(window, { window.previous_bounds().width() - horizontal_borders, window.previous_bounds().height() - vertical_borders});
+    m_compositor.invalidate(previous_bounds);
 }
 
 void WindowManager::start_window_move(Window& window)

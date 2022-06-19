@@ -40,6 +40,12 @@ public:
 
     inline void set_style(StatusBarStyle style) { m_frame.set_style(style), on_style_change(); }
 
+    inline void set_is_maximised(bool is_maximised) {m_is_maximised = is_maximised;}
+    inline bool is_maximised() {return m_is_maximised;}
+
+    inline void set_previous_bounds(LG::Rect bounds) {m_previous_bounds = bounds;}
+    inline LG::Rect previous_bounds() {return m_previous_bounds;}
+
     void make_frame();
     void make_frameless();
 
@@ -47,6 +53,8 @@ private:
     void recalc_bounds(const LG::Size& size);
     void on_style_change();
 
+    LG::Rect m_previous_bounds;
+    bool m_is_maximised = false;
     WindowFrame m_frame;
     LG::CornerMask m_corner_mask { LG::CornerMask::SystemRadius, LG::CornerMask::NonMasked, LG::CornerMask::Masked };
     std::vector<MenuDir> m_menubar_content;

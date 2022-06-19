@@ -50,6 +50,7 @@ public:
     void close_window(Window& window) { send_event(new WindowCloseRequestMessage(window.connection_id(), window.id())); }
     void minimize_window(Window& window);
     void maximize_window(Window& window);
+    void unmaximise_window(Window& window);
 
     template <typename Callback>
     void minimize_windows(Callback callback)
